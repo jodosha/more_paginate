@@ -1,8 +1,8 @@
 module MorePaginate
   def self.included(base)
     base.class_eval %{
-      @@per_page = 30
-      cattr_accessor :per_page
+      class_inheritable_accessor :per_page
+      self.per_page = 30
     }
 
     base.extend ClassMethods
