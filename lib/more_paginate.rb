@@ -52,16 +52,18 @@ module MorePaginate
     end
 
     def sort_value
-      last.try(:read_attribute, sort_key)
+      @sort_value ||= last.try(:read_attribute, sort_key)
     end
   end
 
   module Helpers
     def more_paginate(records, options = {})
+      # TODO prefix options
       options[:text]  ||= t(:more, :default => "more")
       options[:id]    ||= "more_link"
       options[:class] ||= "more_link"      
-      link_to h(options[:text]), "?sort_key=#{h(records.sort_key)}&sort_value=#{h(records.sort_value)}", :id => options[:id], :class => options[:class]
+      link_to h(options[:text]), "?sort_key=#{h(records.sort_key)}&sort_value=#{h(records.sort_value)}",
+        :id => options[:id], :class => options[:class], :"data-sort-value" => records.sort_value
     end
   end
 end
