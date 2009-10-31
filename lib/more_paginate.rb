@@ -31,9 +31,12 @@ module MorePaginate
 
       def add_more_paginate_order!(options)
         if options[:order].blank?
-          options[:order] = "#{table_name}.#{primary_key} ASC"
+          options[:order] = ""
+          options[:order] << (options[:sort_key].blank? ? "" : "#{more_paginate_quoted_sort_key(options[:sort_key])} ASC, ")
+          options[:order] << "#{table_name}.#{primary_key} ASC"
         else
-          options[:order] << ", #{table_name}.#{primary_key} ASC"
+          options[:order] << (options[:sort_key].blank? ? ", " : ", #{more_paginate_quoted_sort_key(options[:sort_key])} ASC, ")
+          options[:order] << "#{table_name}.#{primary_key} ASC"
         end
       end
 
@@ -64,8 +67,12 @@ module MorePaginate
 
       def more_paginate_condition_string(sort_key)
         table_name = self.table_name
-        sort_key = "#{table_name}.#{connection.quote_column_name(sort_key)}"
+        sort_key   = more_paginate_quoted_sort_key(sort_key)
         "(#{sort_key} > ?) OR (#{sort_key} = ? AND #{table_name}.#{primary_key} > ?)"
+      end
+
+      def more_paginate_quoted_sort_key(sort_key)
+        "#{table_name}.#{connection.quote_column_name sort_key}"
       end
   end
 

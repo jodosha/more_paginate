@@ -16,14 +16,23 @@ describe ActiveRecord::Base do
   end
 
   describe "paginate" do
-    it "return first values by default" do
+    it "return first records by id" do
       records = create_records
       Event.paginate(:all).should == records[0...23]
     end
 
-    it "return following values" do
+    it "return following records with same sort value" do
       records = create_records
       Event.paginate(:all, :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23").should == records[23...30]
+    end
+
+    it "return following records with different sort value" do
+      records = create_records
+      records = records.sort_by { |record| record.identifier }
+      sort_record = records[22]
+
+      Event.paginate(:all, :sort_key => "identifier").should == records[0...23]
+      Event.paginate(:all, :sort_key => "identifier", :sort_value => sort_record.identifier, :sort_id => sort_record.id).should == records[23...30]
     end
   end
 
@@ -51,6 +60,14 @@ describe ActiveRecord::Base do
         with_paginate_options options do |options, collection_options|
           options[:order].should            == "events.legacy_id ASC"
           collection_options[:order].should == "events.legacy_id ASC"
+        end
+      end
+
+      it "should add clause for given sort_key" do
+        options = { :order => "name ASC", :sort_key => "name" }
+        with_paginate_options options do |options, collection_options|
+          options[:order].should            == "name ASC, events.\"name\" ASC, events.id ASC"
+          collection_options[:order].should == "name ASC, events.\"name\" ASC, events.id ASC"
         end
       end
     end
@@ -145,7 +162,7 @@ describe ActiveRecord::Base do
       end
 
       it "should use class defined table name" do
-        Event.should_receive(:table_name).and_return "gigs"
+        Event.should_receive(:table_name).twice.and_return "gigs"
         Event.send(:more_paginate_condition_string, "name").should == "(gigs.\"name\" > ?) OR (gigs.\"name\" = ? AND gigs.id > ?)"
       end
 
@@ -163,7 +180,7 @@ describe ActiveRecord::Base do
 
     def create_records
       create_tables
-      30.times { Event.create :name => "ADTR live!" }
+      30.times { Event.create :name => "ADTR live!", :identifier => (rand * 100_000).to_i }
       Event.all
     end
 end
