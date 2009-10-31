@@ -66,6 +66,19 @@ describe MorePaginate::Collection do
     end
   end
 
+  describe "sort_id" do
+    it "should read from last record" do
+      event = Event.create :name => "ADTR live!"
+      collection = instantiate_collection [ event ], :primary_key => "id"
+      collection.sort_id.should == event.id
+    end
+
+    it "should return nil on missing value" do
+      collection = instantiate_collection [ Event.new ], :primary_key => "id"
+      collection.sort_id.should be_nil
+    end
+  end
+
   private
     def instantiate_collection(records = [], options = {})
       MorePaginate::Collection.new records, options

@@ -102,6 +102,16 @@ describe ActiveRecord::Base do
       end
     end
 
+    describe "sort_id" do
+      it "should remove from options" do
+        options = { :sort_id => "23" }
+        with_paginate_options options do |options, collection_options|
+          options[:sort_id].should               be_nil
+          collection_options[:sort_id].should == "23"
+        end
+      end
+    end
+
     describe "conditions" do
       it "should set default" do
         options = { :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }

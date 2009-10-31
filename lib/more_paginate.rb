@@ -96,6 +96,10 @@ module MorePaginate
     def sort_value
       @sort_value ||= last.try(:read_attribute, sort_key)
     end
+
+    def sort_id
+      @sort_id ||= last.try(:read_attribute, @options[:primary_key])
+    end
   end
 
   module Helpers
@@ -105,7 +109,7 @@ module MorePaginate
       options[:content]  ||= t :more
       options[:id]       ||= "more_link"
       options[:class]    ||= "more_link"      
-      link_to h(options[:content]), "#{options[:path_prefix]}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}",
+      link_to h(options[:content]), "#{options[:path_prefix]}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}",
         :id => options[:id], :class => options[:class], :"data-sort-value" => escape(records.sort_value)
     end
   end
