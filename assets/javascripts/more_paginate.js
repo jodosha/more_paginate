@@ -1,12 +1,7 @@
 (function($){  
   $.fn.extend({   
     morePaginate: function(options) {  
-      var defaults = {
-        success: function() { },
-        disabledClass: "disabled"
-      }
-
-      var options = $.extend(defaults, options);
+      var options = $.extend($.fn.morePaginateDefaults, options);
 
       return this.each(function() {
         var link = $(this);
@@ -35,6 +30,11 @@
           return false;
         });
       });
+    },
+
+    morePaginateDefaults: {
+      success: function() { },
+      disabledClass: "disabled"
     }
   });
 })(jQuery);  
