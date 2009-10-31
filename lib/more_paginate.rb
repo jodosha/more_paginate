@@ -92,11 +92,10 @@ module MorePaginate
     include Rack::Utils
 
     def more_paginate(records, options = {})
-      # TODO prefix options
-      options[:text]  ||= t(:more, :default => "more")
-      options[:id]    ||= "more_link"
-      options[:class] ||= "more_link"      
-      link_to h(options[:text]), "?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}",
+      options[:content]  ||= t :more
+      options[:id]       ||= "more_link"
+      options[:class]    ||= "more_link"      
+      link_to h(options[:content]), "#{options[:path_prefix]}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}",
         :id => options[:id], :class => options[:class], :"data-sort-value" => escape(records.sort_value)
     end
   end
