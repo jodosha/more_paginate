@@ -1,23 +1,13 @@
-require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
+require "spec/rake/spectask"
 
-desc 'Default: run unit tests.'
-task :default => :test
-
-desc 'Test the more_paginate plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
+task :default => :spec
+Spec::Rake::SpecTask.new do |t|
+  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.spec_opts = %w(-fs --color)
 end
 
-desc 'Generate documentation for the more_paginate plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'MorePaginate'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+desc "Run all examples with RCov"
+Spec::Rake::SpecTask.new(:rcov) do |t|
+  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.rcov = true
 end
