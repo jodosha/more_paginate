@@ -51,6 +51,19 @@ describe MorePaginate::Collection do
       collection = instantiate_collection [ ], :sort_key => "name"
       collection.sort_value.should be_nil
     end
+
+    it "should return nil on unknown sort_key" do
+      collection = instantiate_collection [ ], :sort_key => "unknown"
+      collection.sort_value.should be_nil
+    end
+
+    it "should return nil on blank sort_key" do
+      collection = instantiate_collection [ ]
+      collection.sort_value.should be_nil
+
+      collection = instantiate_collection [ ], :sort_key => ""
+      collection.sort_value.should be_nil
+    end
   end
 
   private
