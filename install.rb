@@ -1,1 +1,1 @@
-# Install hook code here
+`rake more_paginate:install`

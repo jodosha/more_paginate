@@ -1,1 +1,1 @@
-# Uninstall hook code here
+`rake more_paginate:uninstall`
