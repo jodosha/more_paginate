@@ -44,25 +44,26 @@ module MorePaginate
       def add_more_paginate_conditions!(options)
         sort_key   = options.delete(:sort_key)
         sort_value = options.delete(:sort_value)
+        sort_id    = options.delete(:sort_id).to_i
 
         if sort_value
           case options[:conditions]
           when String
-            options[:conditions] = [ "#{options[:conditions]} AND #{more_paginate_condition_string}", sort_key, sort_value ]
+            options[:conditions] = [ "#{options[:conditions]} AND #{more_paginate_condition_string}", sort_key, sort_value, sort_key, sort_value, sort_id ]
           when Array
             options[:conditions][0] = "#{options[:conditions][0]} AND #{more_paginate_condition_string}"
-            options[:conditions] << [ sort_key, sort_value ]
+            options[:conditions] << [ sort_key, sort_value, sort_key, sort_value, sort_id ]
             options[:conditions].flatten!
           when Hash
             # TODO implement
           else
-            options[:conditions] = [more_paginate_condition_string, sort_key, sort_value]
+            options[:conditions] = [more_paginate_condition_string, sort_key, sort_value, sort_key, sort_value, sort_id]
           end
         end
       end
 
       def more_paginate_condition_string
-        "BINARY(?) > BINARY(?)"
+        "(BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND #{table_name}.#{primary_key} > ?)"
       end
   end
 
