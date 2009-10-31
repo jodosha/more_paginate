@@ -111,6 +111,15 @@ describe ActiveRecord::Base do
       end
     end
 
+    describe "primary key" do
+      it "should set table defined value" do
+        options = { }
+        with_paginate_options options do |options, collection_options|
+          collection_options[:primary_key].should == "id"
+        end
+      end
+    end
+
     describe "more_paginate_condition_string" do
       it "have default value" do
         Event.send(:more_paginate_condition_string).should == "BINARY(?) > BINARY(?)"

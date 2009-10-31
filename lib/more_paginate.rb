@@ -66,17 +66,20 @@ module MorePaginate
       end
   end
 
-  class MorePaginateCollection < Array
+  class Collection < Array
     def initialize(array, options)
       @options = options
       super(array)
     end
 
     def sort_key
-      # TODO use proper primary key instead of hardcoded 'id'
       @options[:sort_key] ||= begin
-        key = @options[:order].split(",").first
-        key.blank ? "id" : key.gsub!(/\s(ASC|DESC)/, "")
+        if @options[:order].blank?
+          @options[:primary_key] || "id"
+        else
+          key = @options[:order].split(",").first
+          key.gsub(/\s(ASC|DESC)/, "")
+        end
       end
     end
 
@@ -94,7 +97,7 @@ module MorePaginate
       options[:id]    ||= "more_link"
       options[:class] ||= "more_link"      
       link_to h(options[:text]), "?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}",
-        :id => options[:id], :class => options[:class], :"data-sort-value" => records.sort_value
+        :id => options[:id], :class => options[:class], :"data-sort-value" => escape(records.sort_value)
     end
   end
 end
