@@ -49,7 +49,7 @@ module MorePaginate
         sort_value = options.delete(:sort_value)
         sort_id    = options.delete(:sort_id).to_i
 
-        if sort_value
+        if sort_value = more_paginate_typecast(sort_value)
           case options[:conditions]
           when String
             options[:conditions] = [ "#{options[:conditions]} AND #{more_paginate_condition_string(sort_key)}", sort_value, sort_value, sort_id ]
@@ -73,6 +73,15 @@ module MorePaginate
 
       def more_paginate_quoted_sort_key(sort_key)
         "#{table_name}.#{connection.quote_column_name sort_key}"
+      end
+
+      def more_paginate_typecast(value)
+        case value
+        when Time, Date
+          value.to_s(:db)
+        else
+          value
+        end
       end
   end
 

@@ -155,6 +155,14 @@ describe ActiveRecord::Base do
           options[:conditions].should == "name IS NOT NULL"
         end
       end
+
+      it "should properly hand time values" do
+        now = Time.now.to_s(:db)
+        options = { :sort_key => "created_at", :sort_value => Time.now }
+        with_paginate_options options do |options, collection_options|
+          options[:conditions].should == ["(events.\"created_at\" > ?) OR (events.\"created_at\" = ? AND events.id > ?)", now, now, 0]
+        end
+      end
     end
 
     describe "primary key" do
@@ -179,6 +187,20 @@ describe ActiveRecord::Base do
       it "should use class defined primary key" do
         Event.should_receive(:primary_key).and_return "legacy_id"
         Event.send(:more_paginate_condition_string, "name").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.legacy_id > ?)"
+      end
+    end
+
+    describe "more_paginate_typecast" do
+      it "should apply to time values" do
+        Event.send(:more_paginate_typecast, Time.now).should == Time.now.to_s(:db)
+      end
+
+      it "should apply to date values" do
+        Event.send(:more_paginate_typecast, Date.today).should == Date.today.to_s(:db)
+      end
+
+      it "should apply to string values" do
+        Event.send(:more_paginate_typecast, "ADTR live!").should == "ADTR live!"
       end
     end
   end
