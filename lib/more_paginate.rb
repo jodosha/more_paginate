@@ -31,9 +31,9 @@ module MorePaginate
 
       def add_more_paginate_order!(options)
         if options[:order].blank?
-          options[:order] = "#{primary_key} ASC"
+          options[:order] = "#{table_name}.#{primary_key} ASC"
         else
-          options[:order] << ", #{primary_key} ASC"
+          options[:order] << ", #{table_name}.#{primary_key} ASC"
         end
       end
 

@@ -20,16 +20,16 @@ describe ActiveRecord::Base do
       it "should set default" do
         options = { }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "id ASC"
-          collection_options[:order].should == "id ASC"
+          options[:order].should            == "events.id ASC"
+          collection_options[:order].should == "events.id ASC"
         end
       end
 
       it "should add default to the already existing value" do
         options = { :order => "name ASC" }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "name ASC, id ASC"
-          collection_options[:order].should == "name ASC, id ASC"
+          options[:order].should            == "name ASC, events.id ASC"
+          collection_options[:order].should == "name ASC, events.id ASC"
         end
       end
 
@@ -37,8 +37,8 @@ describe ActiveRecord::Base do
         options = { }
         Event.should_receive(:primary_key).twice.and_return "legacy_id"
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "legacy_id ASC"
-          collection_options[:order].should == "legacy_id ASC"
+          options[:order].should            == "events.legacy_id ASC"
+          collection_options[:order].should == "events.legacy_id ASC"
         end
       end
     end
