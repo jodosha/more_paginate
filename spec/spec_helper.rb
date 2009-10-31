@@ -9,6 +9,7 @@ load "init.rb"
 require "spec/fixtures"
 
 def create_tables
+  ActiveRecord::Migration.verbose = false
   ActiveRecord::Schema.define do
     create_table :events, :force => true do |t|
       t.string :identifier
