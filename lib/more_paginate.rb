@@ -19,17 +19,21 @@ module MorePaginate
         add_more_paginate_order!(options)
         add_more_paginate_limit!(options)
         collection_options = options.dup
+        add_more_paginate_primary_key!(collection_options)
         add_more_paginate_conditions!(options)
 
         [ options, collection_options ]
       end
 
+      def add_more_paginate_primary_key!(options)
+        options[:primary_key] = primary_key
+      end
+
       def add_more_paginate_order!(options)
-        # TODO use proper primary key instead of hardcoded 'id'
         if options[:order].blank?
-          options[:order] = "id ASC"
+          options[:order] = "#{primary_key} ASC"
         else
-          options[:order] << ", id ASC"
+          options[:order] << ", #{primary_key} ASC"
         end
       end
 

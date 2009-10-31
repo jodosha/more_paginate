@@ -32,6 +32,15 @@ describe ActiveRecord::Base do
           collection_options[:order].should == "name ASC, id ASC"
         end
       end
+
+      it "should use class defined primary key" do
+        options = { }
+        Event.should_receive(:primary_key).twice.and_return "legacy_id"
+        with_paginate_options options do |options, collection_options|
+          options[:order].should            == "legacy_id ASC"
+          collection_options[:order].should == "legacy_id ASC"
+        end
+      end
     end
 
     describe "limit" do
