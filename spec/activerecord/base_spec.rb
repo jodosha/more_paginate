@@ -15,6 +15,18 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe "paginate" do
+    it "return first values by default" do
+      records = create_records
+      Event.paginate(:all).should == records[0...23]
+    end
+
+    it "return following values" do
+      records = create_records
+      Event.paginate(:all, :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23").should == records[23...30]
+    end
+  end
+
   describe "prepare_more_paginate_options" do
     describe "order" do
       it "should set default" do
@@ -77,21 +89,21 @@ describe ActiveRecord::Base do
       it "should set default" do
         options = { :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["(BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND events.id > ?)", "name", "ADTR live!", "name", "ADTR live!", 23]
+          options[:conditions].should == ["(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "ADTR live!", "ADTR live!", 23]
         end        
       end
 
       it "should preserve given string SQL conditions" do
         options = { :conditions => "name IS NOT NULL", :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["name IS NOT NULL AND (BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND events.id > ?)", "name", "ADTR live!", "name", "ADTR live!", 23]
+          options[:conditions].should == ["name IS NOT NULL AND (events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "ADTR live!", "ADTR live!", 23]
         end
       end
 
       it "should preserve given array SQL conditions" do
         options = { :conditions => ["name IS NOT IN(?)", "crappy live"], :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["name IS NOT IN(?) AND (BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND events.id > ?)", "crappy live", "name", "ADTR live!", "name", "ADTR live!", 23]
+          options[:conditions].should == ["name IS NOT IN(?) AND (events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "crappy live", "ADTR live!", "ADTR live!", 23]
         end
       end
 
@@ -99,14 +111,14 @@ describe ActiveRecord::Base do
       # it "should preserve given hash SQL conditions" do
       #   options = { :conditions => { :id => 23 }, :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
       #   with_paginate_options options do |options, collection_options|
-      #     options[:conditions].should == ["id IS IN(?) AND (BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND events.id > ?)", 23, "name", "ADTR live!", "name", "ADTR live!", 23]
+      #     options[:conditions].should == ["id IS IN(?) AND (? > ?) OR (? = ? AND events.id > ?)", 23, "name", "ADTR live!", "name", "ADTR live!", 23]
       #   end
       # end
 
       it "should set to zero missing sort_id" do
         options = { :sort_key => "name", :sort_value => "ADTR live!" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["(BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND events.id > ?)", "name", "ADTR live!", "name", "ADTR live!", 0]
+          options[:conditions].should == ["(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "ADTR live!", "ADTR live!", 0]
         end
       end
 
@@ -129,17 +141,17 @@ describe ActiveRecord::Base do
 
     describe "more_paginate_condition_string" do
       it "have default value" do
-        Event.send(:more_paginate_condition_string).should == "(BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND events.id > ?)"
+        Event.send(:more_paginate_condition_string, "name").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)"
       end
 
       it "should use class defined table name" do
         Event.should_receive(:table_name).and_return "gigs"
-        Event.send(:more_paginate_condition_string).should == "(BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND gigs.id > ?)"
+        Event.send(:more_paginate_condition_string, "name").should == "(gigs.\"name\" > ?) OR (gigs.\"name\" = ? AND gigs.id > ?)"
       end
 
       it "should use class defined primary key" do
         Event.should_receive(:primary_key).and_return "legacy_id"
-        Event.send(:more_paginate_condition_string).should == "(BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND events.legacy_id > ?)"
+        Event.send(:more_paginate_condition_string, "name").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.legacy_id > ?)"
       end
     end
   end
@@ -147,5 +159,11 @@ describe ActiveRecord::Base do
   private
     def with_paginate_options(options)
       yield Event.send :prepare_more_paginate_options!, options
+    end
+
+    def create_records
+      create_tables
+      30.times { Event.create :name => "ADTR live!" }
+      Event.all
     end
 end

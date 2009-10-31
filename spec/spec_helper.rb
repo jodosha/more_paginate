@@ -8,9 +8,14 @@ require "lib/more_paginate"
 load "init.rb"
 require "spec/fixtures"
 
-ActiveRecord::Base.establish_connection :adapter => "sqlite3", :database  => ":memory:"
-ActiveRecord::Schema.define do
-  create_table :events do |t|
-    t.string :name
+def create_tables
+  ActiveRecord::Schema.define do
+    create_table :events, :force => true do |t|
+      t.string :name
+    end
   end
 end
+
+ActiveRecord::Base.establish_connection :adapter => "sqlite3", :database  => ":memory:"
+ActiveRecord::Base.logger = ActiveSupport::BufferedLogger.new "log/database.log"
+create_tables

@@ -11,7 +11,7 @@ module MorePaginate
   module ClassMethods
     def paginate(scope, options = {})
       options, collection_options = prepare_more_paginate_options!(options)
-      MorePaginateCollection.new find(scope, options), collection_options
+      Collection.new find(scope, options), collection_options
     end
 
     private
@@ -49,21 +49,23 @@ module MorePaginate
         if sort_value
           case options[:conditions]
           when String
-            options[:conditions] = [ "#{options[:conditions]} AND #{more_paginate_condition_string}", sort_key, sort_value, sort_key, sort_value, sort_id ]
+            options[:conditions] = [ "#{options[:conditions]} AND #{more_paginate_condition_string(sort_key)}", sort_value, sort_value, sort_id ]
           when Array
-            options[:conditions][0] = "#{options[:conditions][0]} AND #{more_paginate_condition_string}"
-            options[:conditions] << [ sort_key, sort_value, sort_key, sort_value, sort_id ]
+            options[:conditions][0] = "#{options[:conditions][0]} AND #{more_paginate_condition_string(sort_key)}"
+            options[:conditions] << [ sort_value, sort_value, sort_id ]
             options[:conditions].flatten!
           when Hash
             # TODO implement
           else
-            options[:conditions] = [more_paginate_condition_string, sort_key, sort_value, sort_key, sort_value, sort_id]
+            options[:conditions] = [more_paginate_condition_string(sort_key), sort_value, sort_value, sort_id]
           end
         end
       end
 
-      def more_paginate_condition_string
-        "(BINARY(?) > BINARY(?)) OR (BINARY(?) = BINARY(?) AND #{table_name}.#{primary_key} > ?)"
+      def more_paginate_condition_string(sort_key)
+        table_name = self.table_name
+        sort_key = "#{table_name}.#{connection.quote_column_name(sort_key)}"
+        "(#{sort_key} > ?) OR (#{sort_key} = ? AND #{table_name}.#{primary_key} > ?)"
       end
   end
 
