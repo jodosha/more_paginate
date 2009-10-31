@@ -15,7 +15,7 @@
             type: "GET",
             url: link.attr("href"),
             beforeSend: function(xhr){
-              xhr.setRequestHeader("Accept", "text/javascript");
+              xhr.setRequestHeader("Accept", options.accept);
             },
             success: function(data) {
               id = link.attr("id");
@@ -34,7 +34,8 @@
 
     morePaginateDefaults: {
       success: function() { },
-      disabledClass: "disabled"
+      disabledClass: "disabled",
+      accept: "text/javascript"
     }
   });
 })(jQuery);  
