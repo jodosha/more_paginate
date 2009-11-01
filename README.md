@@ -1,7 +1,7 @@
 more_paginate
 =============
 
-Provide a **Twitter like** pagination for Rails
+Provide a **Twitter like** pagination for Rails.
 
 
 Example
@@ -12,6 +12,7 @@ For a full working example, please visit [more\_paginate\_example](http://github
     # app/models/tweet.rb
     class Tweet < ActiveRecord::Base
       belongs_to :person
+
       def self.paginate_by_creation_date(params)
         paginate :all,
           :sort_key   => params[:sort_key] || "created_at",
@@ -26,6 +27,7 @@ For a full working example, please visit [more\_paginate\_example](http://github
     class TweetsController < ApplicationController
       def index
         @tweets = Tweet.paginate_by_creation_date params.dup
+
         respond_to do |format|
           format.html
           format.js { render :partial => "tweet_list" }
@@ -56,6 +58,13 @@ For a full working example, please visit [more\_paginate\_example](http://github
     $(document).ready(function() {
       $("#more_link").morePaginate({ container: "#tweets" });
     });
+
+Acknowledgements
+----------------
+
+* [@lifo](http://twitter.com/lifo) for his great speech about [Lessons learnt](http://m.onkey.org/lessons_learnt_2009.pdf) and pagination.
+* [@deadroxy](http://twitter.com/deadroxy) for her help.
+* The **Yahoo!** team for their awesome [Efficient Pagination Using MySQL](www.scribd.com/doc/14683263/Efficient-Pagination-Using-MySQL) presentation.
 
 Copyright
 ---------
