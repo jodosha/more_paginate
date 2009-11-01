@@ -14,6 +14,13 @@ module MorePaginate
       Collection.new find(scope, options), collection_options
     end
 
+    protected
+      def more_paginate_condition_string(sort_key)
+        table_name = self.table_name
+        sort_key   = more_paginate_quoted_sort_key(sort_key)
+        "(#{sort_key} > ?) OR (#{sort_key} = ? AND #{table_name}.#{primary_key} > ?)"
+      end
+
     private
       def prepare_more_paginate_options!(options)
         add_more_paginate_order!(options)
@@ -63,12 +70,6 @@ module MorePaginate
             options[:conditions] = [more_paginate_condition_string(sort_key), sort_value, sort_value, sort_id]
           end
         end
-      end
-
-      def more_paginate_condition_string(sort_key)
-        table_name = self.table_name
-        sort_key   = more_paginate_quoted_sort_key(sort_key)
-        "(#{sort_key} > ?) OR (#{sort_key} = ? AND #{table_name}.#{primary_key} > ?)"
       end
 
       def more_paginate_quoted_sort_key(sort_key)
