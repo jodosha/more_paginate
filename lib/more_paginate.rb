@@ -16,10 +16,10 @@ module MorePaginate
 
     protected
       def more_paginate_condition_string(sort_key, sort_order = nil)
-        table_name = self.table_name
-        sort_key   = more_paginate_quoted_sort_key(sort_key)
+        table_name = self.quoted_table_name
+        sort_key   = more_paginate_quoted_column(sort_key)
         sort_order = sort_order.to_s.downcase == "desc" ? "<" : ">"
-        "(#{sort_key} #{sort_order} ?) OR (#{sort_key} = ? AND #{table_name}.#{primary_key} #{sort_order} ?)"
+        "(#{sort_key} #{sort_order} ?) OR (#{sort_key} = ? AND #{more_paginate_quoted_column primary_key} #{sort_order} ?)"
       end
 
     private
@@ -42,11 +42,11 @@ module MorePaginate
 
         if options[:order].blank?
           options[:order] = ""
-          options[:order] << (options[:sort_key].blank? ? "" : "#{more_paginate_quoted_sort_key(options[:sort_key])} #{order}, ")
-          options[:order] << "#{table_name}.#{primary_key} #{order}"
+          options[:order] << (options[:sort_key].blank? ? "" : "#{more_paginate_quoted_column(options[:sort_key])} #{order}, ")
+          options[:order] << "#{more_paginate_quoted_column primary_key} #{order}"
         else
-          options[:order] << (options[:sort_key].blank? ? ", " : ", #{more_paginate_quoted_sort_key(options[:sort_key])} #{order}, ")
-          options[:order] << "#{table_name}.#{primary_key} #{order}"
+          options[:order] << (options[:sort_key].blank? ? ", " : ", #{more_paginate_quoted_column(options[:sort_key])} #{order}, ")
+          options[:order] << "#{more_paginate_quoted_column primary_key} #{order}"
         end
       end
 
@@ -76,8 +76,8 @@ module MorePaginate
         end
       end
 
-      def more_paginate_quoted_sort_key(sort_key)
-        "#{table_name}.#{connection.quote_column_name sort_key}"
+      def more_paginate_quoted_column(column)
+        "#{quoted_table_name}.#{connection.quote_column_name column}"
       end
 
       def more_paginate_sql_order(options)

@@ -48,16 +48,16 @@ describe ActiveRecord::Base do
       it "should set default" do
         options = { }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "events.id ASC"
-          collection_options[:order].should == "events.id ASC"
+          options[:order].should            == quoted_sql(%("events"."id" ASC))
+          collection_options[:order].should == quoted_sql(%("events"."id" ASC))
         end
       end
 
       it "should add default to the already existing value" do
         options = { :order => "name ASC" }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "name ASC, events.id ASC"
-          collection_options[:order].should == "name ASC, events.id ASC"
+          options[:order].should            == quoted_sql(%(name ASC, "events"."id" ASC))
+          collection_options[:order].should == quoted_sql(%(name ASC, "events"."id" ASC))
         end
       end
 
@@ -65,30 +65,30 @@ describe ActiveRecord::Base do
         options = { }
         Event.should_receive(:primary_key).twice.and_return "legacy_id"
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "events.legacy_id ASC"
-          collection_options[:order].should == "events.legacy_id ASC"
+          options[:order].should            == quoted_sql(%("events"."legacy_id" ASC))
+          collection_options[:order].should == quoted_sql(%("events"."legacy_id" ASC))
         end
       end
 
       it "should add clause for given sort_key" do
         options = { :order => "name ASC", :sort_key => "name" }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "name ASC, events.\"name\" ASC, events.id ASC"
-          collection_options[:order].should == "name ASC, events.\"name\" ASC, events.id ASC"
+          options[:order].should            == quoted_sql(%(name ASC, "events"."name" ASC, "events"."id" ASC))
+          collection_options[:order].should == quoted_sql(%(name ASC, "events"."name" ASC, "events"."id" ASC))
         end
       end
 
       it "should set order according to given sort_order key" do
         options = { :sort_order => "desc" }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "events.id DESC"
-          collection_options[:order].should == "events.id DESC"
+          options[:order].should            == quoted_sql(%("events"."id" DESC))
+          collection_options[:order].should == quoted_sql(%("events"."id" DESC))
         end
 
         options = { :sort_key => "name", :sort_order => "desc" }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == "events.\"name\" DESC, events.id DESC"
-          collection_options[:order].should == "events.\"name\" DESC, events.id DESC"
+          options[:order].should            == quoted_sql(%("events"."name" DESC, "events"."id" DESC))
+          collection_options[:order].should == quoted_sql(%("events"."name" DESC, "events"."id" DESC))
         end
       end      
     end
@@ -147,21 +147,21 @@ describe ActiveRecord::Base do
       it "should set default" do
         options = { :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "ADTR live!", "ADTR live!", 23]
+          options[:conditions].should == [quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?))), "ADTR live!", "ADTR live!", 23]
         end        
       end
 
       it "should preserve given string SQL conditions" do
         options = { :conditions => "name IS NOT NULL", :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["name IS NOT NULL AND (events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "ADTR live!", "ADTR live!", 23]
+          options[:conditions].should == [quoted_sql(%(name IS NOT NULL AND ("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?))), "ADTR live!", "ADTR live!", 23]
         end
       end
 
       it "should preserve given array SQL conditions" do
         options = { :conditions => ["name IS NOT IN(?)", "crappy live"], :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["name IS NOT IN(?) AND (events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "crappy live", "ADTR live!", "ADTR live!", 23]
+          options[:conditions].should == [quoted_sql(%(name IS NOT IN(?) AND ("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?))), "crappy live", "ADTR live!", "ADTR live!", 23]
         end
       end
 
@@ -176,7 +176,7 @@ describe ActiveRecord::Base do
       it "should set to zero missing sort_id" do
         options = { :sort_key => "name", :sort_value => "ADTR live!" }
         with_paginate_options options do |options, collection_options|
-          options[:conditions].should == ["(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)", "ADTR live!", "ADTR live!", 0]
+          options[:conditions].should == [quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?))), "ADTR live!", "ADTR live!", 0]
         end
       end
 
@@ -199,23 +199,23 @@ describe ActiveRecord::Base do
 
     describe "more_paginate_condition_string" do
       it "have default value" do
-        Event.send(:more_paginate_condition_string, "name").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)"
+        Event.send(:more_paginate_condition_string, "name").should == quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?)))
       end
 
       it "should use class defined table name" do
-        Event.should_receive(:table_name).twice.and_return "gigs"
-        Event.send(:more_paginate_condition_string, "name").should == "(gigs.\"name\" > ?) OR (gigs.\"name\" = ? AND gigs.id > ?)"
+        Event.should_receive(:table_name).at_least(1).times.and_return "gigs"
+        Event.send(:more_paginate_condition_string, "name").should == quoted_sql(%(("gigs"."name" > ?) OR ("gigs"."name" = ? AND "gigs"."id" > ?)))
       end
 
       it "should use class defined primary key" do
         Event.should_receive(:primary_key).and_return "legacy_id"
-        Event.send(:more_paginate_condition_string, "name").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.legacy_id > ?)"
+        Event.send(:more_paginate_condition_string, "name").should == quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."legacy_id" > ?)))
       end
 
       it "should change comparison operator according to given sort_order value" do
-        Event.send(:more_paginate_condition_string, "name", "desc").should == "(events.\"name\" < ?) OR (events.\"name\" = ? AND events.id < ?)"
-        Event.send(:more_paginate_condition_string, "name", "").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)"
-        Event.send(:more_paginate_condition_string, "name", "ascdesc").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)"
+        Event.send(:more_paginate_condition_string, "name", "desc").should    == quoted_sql(%(("events"."name" < ?) OR ("events"."name" = ? AND "events"."id" < ?)))
+        Event.send(:more_paginate_condition_string, "name", "").should        == quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?)))
+        Event.send(:more_paginate_condition_string, "name", "ascdesc").should == quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?)))
       end
     end
     
@@ -246,9 +246,22 @@ describe ActiveRecord::Base do
       yield Event.send :prepare_more_paginate_options!, options
     end
 
+    def quoted_sql(sql)
+      sql.gsub(/"/, escape_string)
+    end
+
     def create_records
       create_tables
       30.times { Event.create :name => "ADTR live!", :identifier => (rand * 100_000).to_i }
       Event.all
+    end
+
+    def escape_string
+      @escape_string ||= begin
+        case ActiveRecord::Base.connection.adapter_name.downcase.to_sym
+          when :sqlite then "\""
+          else              "`"
+        end
+      end
     end
 end
