@@ -94,12 +94,22 @@ module MorePaginate
     end
 
     def sort_value
-      @sort_value ||= last.try(:read_attribute, sort_key)
+      @sort_value ||= typecast last.try(:read_attribute, sort_key)
     end
 
     def sort_id
       @sort_id ||= last.try(:read_attribute, @options[:primary_key])
     end
+
+    private
+      def typecast(value)
+        case value
+        when Time, Date
+          value.to_s(:db)
+        else
+          value
+        end
+      end
   end
 
   module Helpers

@@ -64,6 +64,18 @@ describe MorePaginate::Collection do
       collection = instantiate_collection [ ], :sort_key => ""
       collection.sort_value.should be_nil
     end
+
+    it "should properly handle time values" do
+      event = Event.create :name => "ADTR live!"
+      collection = instantiate_collection [ event ], :sort_key => "created_at"
+      collection.sort_value.should == Time.now.to_s(:db)
+    end
+
+    it "should properly handle date values" do
+      event = Event.create :name => "ADTR live!", :start_on => Date.today
+      collection = instantiate_collection [ event ], :sort_key => "start_on"
+      collection.sort_value.should == Date.today.to_s(:db)
+    end
   end
 
   describe "sort_id" do
