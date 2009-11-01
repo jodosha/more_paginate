@@ -94,11 +94,19 @@ describe ActiveRecord::Base do
     end
 
     describe "limit" do
-      it "should force class value" do
-        options = { :limit => 1000 }
+      it "should use class value by default" do
+        options = { }
         with_paginate_options options do |options, collection_options|
           options[:limit].should            == Event.per_page
           collection_options[:limit].should == Event.per_page
+        end
+      end
+
+      it "should use given value" do
+        options = { :limit => 1000 }
+        with_paginate_options options do |options, collection_options|
+          options[:limit].should            == 1000
+          collection_options[:limit].should == 1000
         end
       end
     end
