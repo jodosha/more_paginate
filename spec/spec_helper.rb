@@ -14,7 +14,6 @@ def create_tables
     create_table :events, :force => true do |t|
       t.string :identifier
       t.string :name
-      t.timestamps
     end
   end
 end
