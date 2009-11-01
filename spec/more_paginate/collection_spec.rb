@@ -91,6 +91,26 @@ describe MorePaginate::Collection do
     end
   end
 
+  describe "sort_order" do
+    it "should read from options" do
+      collection = instantiate_collection [ Event.new ], :sort_order => "asc"
+      collection.sort_order.should == "asc"
+
+      collection = instantiate_collection [ Event.new ], :sort_order => "desc"
+      collection.sort_order.should == "desc"
+    end
+
+    it "should ignore all but 'asc' and 'desc' values" do
+      collection = instantiate_collection [ Event.new ], :sort_order => "unknown"
+      collection.sort_order.should == ""
+    end
+
+    it "should clarify ambiguous values" do
+      collection = instantiate_collection [ Event.new ], :sort_order => "ascdesc"
+      collection.sort_order.should == ""
+    end
+  end
+
   private
     def instantiate_collection(records = [], options = {})
       MorePaginate::Collection.new records, options

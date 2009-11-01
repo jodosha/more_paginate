@@ -34,6 +34,13 @@ describe ActiveRecord::Base do
       Event.paginate(:all, :sort_key => "identifier").should == records[0...23]
       Event.paginate(:all, :sort_key => "identifier", :sort_value => sort_record.identifier, :sort_id => sort_record.id).should == records[23...30]
     end
+
+    it "return descending sorted records" do
+      records = create_records
+      records = records.sort_by { |record| record.created_at }.reverse
+
+      Event.paginate(:all, :sort_key => "created_at", :sort_order => "desc").should == records[0...23]
+    end
   end
 
   describe "prepare_more_paginate_options" do
@@ -70,6 +77,20 @@ describe ActiveRecord::Base do
           collection_options[:order].should == "name ASC, events.\"name\" ASC, events.id ASC"
         end
       end
+
+      it "should set order according to given sort_order key" do
+        options = { :sort_order => "desc" }
+        with_paginate_options options do |options, collection_options|
+          options[:order].should            == "events.id DESC"
+          collection_options[:order].should == "events.id DESC"
+        end
+
+        options = { :sort_key => "name", :sort_order => "desc" }
+        with_paginate_options options do |options, collection_options|
+          options[:order].should            == "events.\"name\" DESC, events.id DESC"
+          collection_options[:order].should == "events.\"name\" DESC, events.id DESC"
+        end
+      end      
     end
 
     describe "limit" do
@@ -108,6 +129,16 @@ describe ActiveRecord::Base do
         with_paginate_options options do |options, collection_options|
           options[:sort_id].should               be_nil
           collection_options[:sort_id].should == "23"
+        end
+      end
+    end
+
+    describe "sort_order" do
+      it "should remove from options" do
+        options = { :sort_order => "asc" }
+        with_paginate_options options do |options, collection_options|
+          options[:sort_order].should               be_nil
+          collection_options[:sort_order].should == "asc"
         end
       end
     end
@@ -179,6 +210,33 @@ describe ActiveRecord::Base do
       it "should use class defined primary key" do
         Event.should_receive(:primary_key).and_return "legacy_id"
         Event.send(:more_paginate_condition_string, "name").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.legacy_id > ?)"
+      end
+
+      it "should change comparison operator according to given sort_order value" do
+        Event.send(:more_paginate_condition_string, "name", "desc").should == "(events.\"name\" < ?) OR (events.\"name\" = ? AND events.id < ?)"
+        Event.send(:more_paginate_condition_string, "name", "").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)"
+        Event.send(:more_paginate_condition_string, "name", "ascdesc").should == "(events.\"name\" > ?) OR (events.\"name\" = ? AND events.id > ?)"
+      end
+    end
+    
+    describe "more_paginate_sql_order" do
+      it "should return ASC by default" do
+        options = { }
+        Event.send(:more_paginate_sql_order, options).should == "ASC"
+
+        options = { :sort_order => "unknown" }
+        Event.send(:more_paginate_sql_order, options).should == "ASC"
+
+        options = { :sort_order => "ascdesc" }
+        Event.send(:more_paginate_sql_order, options).should == "ASC"
+      end
+
+      it "should return DESC when specified" do
+        options = { :sort_order => "desc" }
+        Event.send(:more_paginate_sql_order, options).should == "DESC"
+
+        options = { :sort_order => "DESC" }
+        Event.send(:more_paginate_sql_order, options).should == "DESC"
       end
     end
   end

@@ -15,10 +15,11 @@ module MorePaginate
     end
 
     protected
-      def more_paginate_condition_string(sort_key)
+      def more_paginate_condition_string(sort_key, sort_order = nil)
         table_name = self.table_name
         sort_key   = more_paginate_quoted_sort_key(sort_key)
-        "(#{sort_key} > ?) OR (#{sort_key} = ? AND #{table_name}.#{primary_key} > ?)"
+        sort_order = sort_order.to_s.downcase == "desc" ? "<" : ">"
+        "(#{sort_key} #{sort_order} ?) OR (#{sort_key} = ? AND #{table_name}.#{primary_key} #{sort_order} ?)"
       end
 
     private
@@ -37,13 +38,15 @@ module MorePaginate
       end
 
       def add_more_paginate_order!(options)
+        order = more_paginate_sql_order(options)
+
         if options[:order].blank?
           options[:order] = ""
-          options[:order] << (options[:sort_key].blank? ? "" : "#{more_paginate_quoted_sort_key(options[:sort_key])} ASC, ")
-          options[:order] << "#{table_name}.#{primary_key} ASC"
+          options[:order] << (options[:sort_key].blank? ? "" : "#{more_paginate_quoted_sort_key(options[:sort_key])} #{order}, ")
+          options[:order] << "#{table_name}.#{primary_key} #{order}"
         else
-          options[:order] << (options[:sort_key].blank? ? ", " : ", #{more_paginate_quoted_sort_key(options[:sort_key])} ASC, ")
-          options[:order] << "#{table_name}.#{primary_key} ASC"
+          options[:order] << (options[:sort_key].blank? ? ", " : ", #{more_paginate_quoted_sort_key(options[:sort_key])} #{order}, ")
+          options[:order] << "#{table_name}.#{primary_key} #{order}"
         end
       end
 
@@ -55,25 +58,30 @@ module MorePaginate
         sort_key   = options.delete(:sort_key)
         sort_value = options.delete(:sort_value)
         sort_id    = options.delete(:sort_id).to_i
+        sort_order = options.delete(:sort_order)
 
         if sort_value
           case options[:conditions]
           when String
-            options[:conditions] = [ "#{options[:conditions]} AND #{more_paginate_condition_string(sort_key)}", sort_value, sort_value, sort_id ]
+            options[:conditions] = [ "#{options[:conditions]} AND #{more_paginate_condition_string(sort_key, sort_order)}", sort_value, sort_value, sort_id ]
           when Array
-            options[:conditions][0] = "#{options[:conditions][0]} AND #{more_paginate_condition_string(sort_key)}"
+            options[:conditions][0] = "#{options[:conditions][0]} AND #{more_paginate_condition_string(sort_key, sort_order)}"
             options[:conditions] << [ sort_value, sort_value, sort_id ]
             options[:conditions].flatten!
           when Hash
             # TODO implement
           else
-            options[:conditions] = [more_paginate_condition_string(sort_key), sort_value, sort_value, sort_id]
+            options[:conditions] = [more_paginate_condition_string(sort_key, sort_order), sort_value, sort_value, sort_id]
           end
         end
       end
 
       def more_paginate_quoted_sort_key(sort_key)
         "#{table_name}.#{connection.quote_column_name sort_key}"
+      end
+
+      def more_paginate_sql_order(options)
+        options[:sort_order].to_s.downcase == "desc" ? "DESC" : "ASC"
       end
   end
 
@@ -102,6 +110,15 @@ module MorePaginate
       @sort_id ||= last.try(:read_attribute, @options[:primary_key])
     end
 
+    def sort_order
+      @sort_order ||= begin
+        return "" if @options[:sort_order].blank?
+
+        result = @options[:sort_order].to_s.downcase.gsub(/[^(asc|desc)]/, "")
+        %w(asc desc).include?(result) ? result : ""
+      end
+    end
+
     private
       def typecast(value)
         case value
@@ -119,8 +136,12 @@ module MorePaginate
     def more_paginate(records, options = {})
       options[:content]  ||= t :more
       options[:id]       ||= "more_link"
-      options[:class]    ||= "more_link"      
-      link_to h(options[:content]), "#{options[:path_prefix]}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}",
+      options[:class]    ||= "more_link"
+
+      url = "#{options[:path_prefix]}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
+      url << "&sort_order=#{h(records.sort_order)}" unless records.sort_order.blank?
+
+      link_to h(options[:content]), url,
         :id => options[:id], :class => options[:class], :"data-sort-value" => escape(records.sort_value)
     end
   end

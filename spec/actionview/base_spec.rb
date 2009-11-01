@@ -83,6 +83,21 @@ describe ActionView::Base do
       end
     end
 
+    describe "sort_order" do
+      it "should not display by default" do
+        events = records [ Event.new ]
+        helper.more_paginate(events).should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link">more</a>)
+      end
+
+      it "should display given value" do
+        events = records [ Event.new ], :sort_order => "asc"
+        helper.more_paginate(events).should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=&amp;sort_order=asc" class="more_link" data-sort-value="" id="more_link">more</a>)
+
+        events = records [ Event.new ], :sort_order => "desc"
+        helper.more_paginate(events).should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=&amp;sort_order=desc" class="more_link" data-sort-value="" id="more_link">more</a>)
+      end
+    end
+
     describe "data-sort-value" do
       it "should set HTML5 attribute" do
         events = records [ Event.new :name => "ADTR live!" ], :sort_key => "name"
