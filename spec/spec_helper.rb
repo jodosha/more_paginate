@@ -18,6 +18,14 @@ def create_tables
 
       t.timestamps
     end
+
+    create_table :photos, :force => true do |t|
+      t.references :event
+      t.string     :identifier
+      t.string     :title
+
+      t.timestamps
+    end
   end
 end
 
