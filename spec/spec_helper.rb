@@ -38,6 +38,20 @@ def create_tables
 
       t.timestamps
     end
+    
+    create_table :tags, :force => true do |t|
+      t.string :identifier
+      t.string :name
+
+      t.timestamps
+    end
+
+    create_table :taggings, :force => true do |t|
+      t.references :taggable, :polymorphic => true
+      t.references :tag
+
+      t.timestamps
+    end
   end
 end
 
