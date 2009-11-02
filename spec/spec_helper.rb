@@ -19,6 +19,18 @@ def create_tables
       t.timestamps
     end
 
+    create_table :people, :force => true do |t|
+      t.string :identifier
+      t.string :name
+
+      t.timestamps
+    end
+
+    create_table :events_people, :force => true, :id => false do |t|
+      t.references :event
+      t.references :person
+    end
+
     create_table :photos, :force => true do |t|
       t.references :event
       t.string     :identifier
