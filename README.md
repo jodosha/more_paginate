@@ -1,8 +1,22 @@
 more_paginate
 =============
 
-Provide a **Twitter like** pagination for Rails.
+**Twitter like** pagination for Rails.
 
+Basic usage
+-----------
+
+`more_paginate` provides a class and associations level method for paginate your records:
+
+    Tweet.paginate :all
+    person.tweets.paginate :all
+
+It's just a tiny enforcement for `ActiveRecord::Base#find` and it accepts the following additional params:
+
+* `sort_key`
+* `sort_value`
+* `sort_id`
+* `sort_order` (optional)
 
 Example
 -------
