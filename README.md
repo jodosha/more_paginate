@@ -51,7 +51,7 @@ For a full working example, please visit [more\_paginate\_example](http://github
         <span class="time"><%= link_to tweet.created_at.to_s(:db), tweet_path(tweet) %></span>
       </li>
     <% end -%>
-    </ul>
+    <ol>
     <%= more_paginate @tweets %>
 
     # public/javascripts/application.js
@@ -64,7 +64,7 @@ Acknowledgements
 
 * [@lifo](http://twitter.com/lifo) for his great speech about [Lessons learnt](http://m.onkey.org/lessons_learnt_2009.pdf) and pagination.
 * [@deadroxy](http://twitter.com/deadroxy) for her help.
-* The **Yahoo!** team for their awesome [Efficient Pagination Using MySQL](www.scribd.com/doc/14683263/Efficient-Pagination-Using-MySQL) presentation.
+* The **Yahoo!** team for their awesome [Efficient Pagination Using MySQL](http://www.scribd.com/doc/14683263/Efficient-Pagination-Using-MySQL) presentation.
 
 Copyright
 ---------
