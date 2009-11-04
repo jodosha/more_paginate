@@ -73,8 +73,8 @@ describe ActiveRecord::Base do
       it "should add clause for given sort_key" do
         options = { :order => "name ASC", :sort_key => "name" }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == quoted_sql(%(name ASC, "events"."name" ASC, "events"."id" ASC))
-          collection_options[:order].should == quoted_sql(%(name ASC, "events"."name" ASC, "events"."id" ASC))
+          options[:order].should            == quoted_sql(%(name ASC, "name" ASC, "events"."id" ASC))
+          collection_options[:order].should == quoted_sql(%(name ASC, "name" ASC, "events"."id" ASC))
         end
       end
 
@@ -87,8 +87,8 @@ describe ActiveRecord::Base do
 
         options = { :sort_key => "name", :sort_order => "desc" }
         with_paginate_options options do |options, collection_options|
-          options[:order].should            == quoted_sql(%("events"."name" DESC, "events"."id" DESC))
-          collection_options[:order].should == quoted_sql(%("events"."name" DESC, "events"."id" DESC))
+          options[:order].should            == quoted_sql(%("name" DESC, "events"."id" DESC))
+          collection_options[:order].should == quoted_sql(%("name" DESC, "events"."id" DESC))
         end
       end      
     end

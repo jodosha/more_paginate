@@ -42,10 +42,10 @@ module MorePaginate
 
         if options[:order].blank?
           options[:order] = ""
-          options[:order] << (options[:sort_key].blank? ? "" : "#{more_paginate_quoted_column(options[:sort_key])} #{order}, ")
+          options[:order] << (options[:sort_key].blank? ? "" : "#{connection.quote_column_name(options[:sort_key])} #{order}, ")
           options[:order] << "#{more_paginate_quoted_column primary_key} #{order}"
         else
-          options[:order] << (options[:sort_key].blank? ? ", " : ", #{more_paginate_quoted_column(options[:sort_key])} #{order}, ")
+          options[:order] << (options[:sort_key].blank? ? ", " : ", #{connection.quote_column_name(options[:sort_key])} #{order}, ")
           options[:order] << "#{more_paginate_quoted_column primary_key} #{order}"
         end
       end
