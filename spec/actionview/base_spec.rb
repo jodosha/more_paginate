@@ -89,12 +89,17 @@ describe ActionView::Base do
         helper.more_paginate(events).should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link">more</a>)
       end
 
-      it "should display given value" do
+      it "should display the association value" do
         events = records [ Event.new ], :sort_order => "asc"
         helper.more_paginate(events).should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=&amp;sort_order=asc" class="more_link" data-sort-value="" id="more_link">more</a>)
 
         events = records [ Event.new ], :sort_order => "desc"
         helper.more_paginate(events).should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=&amp;sort_order=desc" class="more_link" data-sort-value="" id="more_link">more</a>)
+      end
+
+      it "should allow to override the association value" do
+        events = records [ Event.new ], :sort_order => "asc"
+        helper.more_paginate(events, :sort_order => "desc").should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=&amp;sort_order=desc" class="more_link" data-sort-value="" id="more_link">more</a>)
       end
     end
 

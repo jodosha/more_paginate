@@ -139,7 +139,11 @@ module MorePaginate
       options[:class]    ||= "more_link"
 
       url = "#{options[:path_prefix]}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
-      url << "&sort_order=#{h(records.sort_order)}" unless records.sort_order.blank?
+      if options[:sort_order]
+        url << "&sort_order=#{h(options[:sort_order])}"
+      elsif not records.sort_order.blank?
+        url << "&sort_order=#{h(records.sort_order)}"
+      end
 
       link_to h(options[:content]), url,
         :id => options[:id], :class => options[:class], :"data-sort-value" => escape(records.sort_value)
