@@ -1,5 +1,16 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+class MockHelper
+  attr_accessor :output_buffer
+
+  include ActionView::Helpers
+  include MorePaginate::Helpers
+
+  def initialize
+    @output_buffer = ""
+  end
+end
+
 describe ActionView::Base do
   describe "more_paginate" do
     describe "content" do
@@ -22,6 +33,12 @@ describe ActionView::Base do
         with_locale :de do
           helper.more_paginate(records).should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link">&lt;span class=&quot;translation_missing&quot;&gt;de, more&lt;/span&gt;</a>)
         end
+      end
+
+      it "should accept a &block for yielding extra contents" do
+        helper.more_paginate(records) do
+          %(<img src="/images/more.png" />)
+        end.should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link"><img src="/images/more.png" /></a>)
       end
     end
 
@@ -129,11 +146,6 @@ describe ActionView::Base do
     end
 
     def helper
-      @helper ||= begin
-        helper = Object.new
-        helper.extend ActionView::Helpers
-        helper.extend MorePaginate::Helpers
-        helper
-      end
+      @helper ||= MockHelper.new
     end
 end

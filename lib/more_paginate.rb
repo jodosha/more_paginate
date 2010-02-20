@@ -133,20 +133,67 @@ module MorePaginate
   module Helpers
     include Rack::Utils
 
-    def more_paginate(records, options = {})
-      options[:content]  ||= t :more
+    # Creates a link tag as JavaScript hook for pagination.
+    #
+    # ==== Options
+    # * <tt>:content => "load more tweets"</tt> - This will change the link
+    # content. If this option is missing, <tt>t(:more)</tt> will be invoked.
+    # * <tt>:id => "more-tweets"</tt> - Assign a custom DOM id. Default is
+    # <tt>more_link</tt>
+    # * <tt>:class => "more-tweets"</tt> - Assign CSS classes. Default is
+    # <tt>more_link</tt>
+    # * <tt>:path_prefix => "/timeline"</tt> - This will set a prefix to the
+    # generated query string.
+    # * <tt>:sort_order => "desc"</tt> - This will change the records sort order
+    # in the future AJAX requests. Default is <tt>desc</tt>
+    #
+    # ==== Examples
+    # Basic usage:
+    #   <%= more_paginate @tweets %>
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc">more</a>
+    #
+    # Specify the content:
+    #   <%= more_paginate @tweets, :content => "more tweets please!" %>
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc">more tweets please!</a>
+    #
+    # Or specify the content by passing a block:
+    #   <% more_paginate @tweets %>
+    #     <span class="more">more tweets</span>
+    #   <% end %>
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc"><span class="more">more tweets</span></a>
+    #
+    # Specify the DOM id:
+    #   <%= more_paginate @tweets, :id => "more-tweets" %>
+    #     # => <a id="more-tweets" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc">more</a>
+    #
+    # Specify the <tt>class</tt> attribute:
+    #   <%= more_paginate @tweets, :class => "span-6 more-tweets" %>
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="span-6 more-tweets" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc">more</a>
+    #
+    # Specify a path prefix:
+    #   <%= more_paginate @tweets, :path_prefix => "/timeline" %>
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="/timeline?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc">more</a>
+    #
+    #   <%= more_paginate @tweets, :sort_order => "asc" %>
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=asc">more</a>    
+    def more_paginate(records, options = {}, &block)
+      content = options.delete(:content) || t(:more)
+      options.merge!(:"data-sort-value" => escape(records.sort_value))
       options[:id]       ||= "more_link"
       options[:class]    ||= "more_link"
 
-      url = "#{options[:path_prefix]}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
-      if options[:sort_order]
-        url << "&sort_order=#{h(options[:sort_order])}"
+      url = "#{options.delete(:path_prefix)}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
+      if sort_order = options.delete(:sort_order)
+        url << "&sort_order=#{h(sort_order)}"
       elsif not records.sort_order.blank?
         url << "&sort_order=#{h(records.sort_order)}"
       end
 
-      link_to h(options[:content]), url,
-        :id => options[:id], :class => options[:class], :"data-sort-value" => escape(records.sort_value)
+      if block_given?
+        link_to concat(capture(&block)), url, options
+      else
+        link_to h(content), url, options
+      end
     end
   end
 end
