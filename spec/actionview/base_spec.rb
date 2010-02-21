@@ -120,6 +120,12 @@ describe ActionView::Base do
       end
     end
 
+    describe "query" do
+      it "should prepend query string with user defined values" do
+        helper.more_paginate(records, :query => "q=Rome").should == %(<a href="?q=Rome&amp;sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link">more</a>)
+      end
+    end
+
     describe "data-sort-value" do
       it "should set HTML5 attribute" do
         events = records [ Event.new :name => "ADTR live!" ], :sort_key => "name"

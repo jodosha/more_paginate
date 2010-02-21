@@ -174,15 +174,22 @@ module MorePaginate
     #   <%= more_paginate @tweets, :path_prefix => "/timeline" %>
     #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="/timeline?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc">more</a>
     #
+    # Specify a sort order:
     #   <%= more_paginate @tweets, :sort_order => "asc" %>
-    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=asc">more</a>    
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=asc">more</a>
+    #
+    # Specify a query string:
+    #   <%= more_paginate @tweets, :query => "q=Rome" %>
+    #     # => <a id="more_link" data-sort-value="2010-02-20+00%3A52%3A55" class="more_link" href="?q=Rome&sort_key=created_at&amp;sort_value=2010-02-20+00%3A52%3A55&amp;sort_id=785&amp;sort_order=desc">more</a>
     def more_paginate(records, options = {}, &block)
       content = options.delete(:content) || t(:more)
+      query   = options.delete(:query) || ""
+      query << "&" unless query.blank?
       options.merge!(:"data-sort-value" => escape(records.sort_value))
       options[:id]       ||= "more_link"
       options[:class]    ||= "more_link"
 
-      url = "#{options.delete(:path_prefix)}?sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
+      url = "#{options.delete(:path_prefix)}?#{query}sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
       if sort_order = options.delete(:sort_order)
         url << "&sort_order=#{h(sort_order)}"
       elsif not records.sort_order.blank?

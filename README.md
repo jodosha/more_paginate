@@ -83,4 +83,4 @@ Acknowledgements
 Copyright
 ---------
 
-Copyright (c) 2009 [Luca Guidi](http://lucaguidi.com), released under the MIT license.
+Copyright (c) 2010 [Luca Guidi](http://lucaguidi.com), released under the MIT license.
