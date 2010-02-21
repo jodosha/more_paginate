@@ -35,10 +35,18 @@ describe ActionView::Base do
         end
       end
 
-      it "should accept a &block for yielding extra contents" do
-        helper.more_paginate(records) do
-          %(<img src="/images/more.png" />)
-        end.should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link"><img src="/images/more.png" /></a>)
+      describe "block" do
+        it "should accept a &block for yielding extra contents" do
+          helper.more_paginate(records) do
+            %(<img src="/images/more.png" />)
+          end.should == %(<a href="?sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link"><img src="/images/more.png" /></a>)
+        end
+
+        it "should correctly pass the options to the link" do
+          helper.more_paginate(records, :query => "q=Rome") do
+            %(<img src="/images/more.png" />)
+          end.should == %(<a href="?q=Rome&amp;sort_key=id&amp;sort_value=&amp;sort_id=" class="more_link" data-sort-value="" id="more_link"><img src="/images/more.png" /></a>)
+        end
       end
     end
 
