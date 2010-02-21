@@ -6,7 +6,7 @@
       return this.each(function() {
         var link = $(this);
         link.click(function() {
-          if(null == link.attr("data-sort-value")) {
+          if("" == link.attr("data-sort-value")) {
             link.addClass(options.disabledClass);
             return false;
           }
