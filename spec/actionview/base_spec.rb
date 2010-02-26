@@ -148,7 +148,8 @@ describe ActionView::Base do
   end
 
   private
-    def records(records = [], options = {})
+    def records(records = [ ], options = { })
+      options.merge!(:limit => Event.per_page) unless options[:limit].present?
       MorePaginate::Collection.new records, options
     end
 

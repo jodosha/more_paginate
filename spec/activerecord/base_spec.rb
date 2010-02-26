@@ -97,8 +97,8 @@ describe ActiveRecord::Base do
       it "should use class value by default" do
         options = { }
         with_paginate_options options do |options, collection_options|
-          options[:limit].should            == Event.per_page
-          collection_options[:limit].should == Event.per_page
+          options[:limit].should            == Event.per_page + 1
+          collection_options[:limit].should == Event.per_page + 1
         end
       end
 

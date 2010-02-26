@@ -4,7 +4,7 @@ describe ActiveRecord::Associations::HasManyAssociation do
   describe "paginate" do
     it "return first records by id" do
       event, records = create_records
-      event.photos.paginate(:all, :limit => 23).should == records[0...23]
+      event.photos.paginate(:all, :limit => 23 + 1).should == records[0...23]
     end
 
     it "return following records with same sort value" do
@@ -17,8 +17,8 @@ describe ActiveRecord::Associations::HasManyAssociation do
       records = records.sort_by { |record| record.identifier }
       sort_record = records[22]
 
-      event.photos.paginate(:all, :sort_key => "identifier", :limit => 23).should == records[0...23]
-      event.photos.paginate(:all, :sort_key => "identifier", :limit => 23, :sort_value => sort_record.identifier, :sort_id => sort_record.id).should == records[23...30]
+      event.photos.paginate(:all, :sort_key => "identifier", :limit => 23 + 1).should == records[0...23]
+      event.photos.paginate(:all, :sort_key => "identifier", :limit => 23 + 1, :sort_value => sort_record.identifier, :sort_id => sort_record.id).should == records[23...30]
     end
 
     it "return descending sorted records" do

@@ -51,7 +51,7 @@ module MorePaginate
       end
 
       def add_more_paginate_limit!(options)
-        options[:limit] = options.fetch(:limit, per_page)
+        options[:limit] = options.fetch(:limit, per_page + 1)
       end
 
       def add_more_paginate_conditions!(options)
@@ -88,7 +88,12 @@ module MorePaginate
   class Collection < Array
     def initialize(array, options)
       @options = options
+      calculate_more! array
       super(array)
+    end
+
+    def more?
+      @more
     end
 
     def sort_key
@@ -120,6 +125,15 @@ module MorePaginate
     end
 
     private
+      def calculate_more!(array)
+        if @options[:limit] == array.size
+          @more = true
+          array.pop
+        end
+
+        @options.merge!(:limit => @options.delete(:limit) - 1)
+      end
+
       def typecast(value)
         case value
         when Time, Date

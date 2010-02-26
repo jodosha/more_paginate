@@ -1,5 +1,9 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+MorePaginate::Collection.class_eval do
+  attr_reader :options
+end
+
 describe MorePaginate::Collection do
   it "should inherit from Array" do
     MorePaginate::Collection.superclass.should == Array
@@ -111,8 +115,29 @@ describe MorePaginate::Collection do
     end
   end
 
+  describe "calculate_more!" do
+    describe "more elements" do
+      it "should remove last element and set more on true" do
+        collection = instantiate_collection((1...25).to_a, :limit => Event.per_page + 1)
+        collection.should be_more
+        collection.size.should == collection.options[:limit]
+      end
+    end
+
+    describe "few elements" do
+      it "should keep all the collection" do
+        records = (1..3).to_a
+        original_size = records.size
+        collection = instantiate_collection records, :limit => 23
+        collection.should_not be_more
+        collection.size.should == original_size
+      end
+    end
+  end
+
   private
-    def instantiate_collection(records = [], options = {})
+    def instantiate_collection(records = [], options = { })
+      options.merge!(:limit => Event.per_page + 1) unless options[:limit].present?
       MorePaginate::Collection.new records, options
     end
 end
