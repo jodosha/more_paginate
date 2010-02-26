@@ -12,6 +12,12 @@ var TestUtil = {
 }
 
 module("morePaginate");
+test("should disable link on empty query string", function() {
+  var link = $("#no_more_link");
+  link.morePaginate({ container: "#events" });
+  ok(link.hasClass("disabled"), "Expected 'disabled' class");
+});
+
 test("should disable link on blank data-sort-value attribute", function() {
   var link = $("#missing_data_sort_link");
   link.morePaginate({ container: "#events" });

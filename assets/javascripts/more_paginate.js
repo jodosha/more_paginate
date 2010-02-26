@@ -1,10 +1,16 @@
-(function($){  
-  $.fn.extend({   
-    morePaginate: function(options) {  
+(function($){
+  $.fn.extend({
+    morePaginate: function(options) {
       var options = $.extend($.fn.morePaginateDefaults, options);
 
       return this.each(function() {
         var link = $(this);
+
+        if ("#" == link.attr("href")) { 
+          link.addClass(options.disabledClass);
+          link.attr("data-sort-value", "");
+        }
+
         link.click(function() {
           if("" == link.attr("data-sort-value")) {
             link.addClass(options.disabledClass);
@@ -38,4 +44,4 @@
       accept: "text/javascript"
     }
   });
-})(jQuery);  
+})(jQuery);
