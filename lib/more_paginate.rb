@@ -203,11 +203,14 @@ module MorePaginate
       options[:id]       ||= "more_link"
       options[:class]    ||= "more_link"
 
-      url = "#{options.delete(:path_prefix)}?#{query}sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
-      if sort_order = options.delete(:sort_order)
-        url << "&sort_order=#{h(sort_order)}"
-      elsif not records.sort_order.blank?
-        url << "&sort_order=#{h(records.sort_order)}"
+      url = "#"
+      if records.more?
+        url = "#{options.delete(:path_prefix)}?#{query}sort_key=#{h(records.sort_key)}&sort_value=#{escape(records.sort_value)}&sort_id=#{records.sort_id}"
+        if sort_order = options.delete(:sort_order)
+          url << "&sort_order=#{h(sort_order)}"
+        elsif not records.sort_order.blank?
+          url << "&sort_order=#{h(records.sort_order)}"
+        end
       end
 
       if block_given?
