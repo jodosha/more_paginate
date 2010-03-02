@@ -216,16 +216,17 @@ module MorePaginate
       if block_given?
         link_to concat(capture(&block)), url, options
       else
-        link_to h(content), url, options
+        link_to escape_content(content), url, options
       end
     end
 
-    def h(content)
-      if content.try(:html_safe?)
-        content
-      else
-        super
+    private
+      def escape_content(content)
+        if content.try(:html_safe?)
+          content
+        else
+          h content
+        end
       end
-    end
   end
 end
