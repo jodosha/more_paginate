@@ -219,5 +219,13 @@ module MorePaginate
         link_to h(content), url, options
       end
     end
+
+    def h(content)
+      if content.try(:html_safe?)
+        content
+      else
+        super
+      end
+    end
   end
 end

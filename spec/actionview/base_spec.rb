@@ -22,6 +22,10 @@ describe ActionView::Base do
         helper.more_paginate(records, :content => "<script>xss</script>").should == %(<a href="#" class="more_link" data-sort-value="" id="more_link">&lt;script&gt;xss&lt;/script&gt;</a>)
       end
 
+      it "should escape given text unless marked as safe" do
+        helper.more_paginate(records, :content => "<span>more</span>".html_safe!).should == %(<a href="#" class="more_link" data-sort-value="" id="more_link"><span>more</span></a>)
+      end
+
       it "should show text according to the current locale" do
         I18n.backend.store_translations :it, :more => "ancora"
         with_locale :it do
@@ -31,7 +35,7 @@ describe ActionView::Base do
 
       it "should show missing translation message if current locale has no :more key" do
         with_locale :de do
-          helper.more_paginate(records).should == %(<a href="#" class="more_link" data-sort-value="" id="more_link">&lt;span class=&quot;translation_missing&quot;&gt;de, more&lt;/span&gt;</a>)
+          helper.more_paginate(records).should == %(<a href="#" class="more_link" data-sort-value="" id="more_link"><span class=\"translation_missing\">de, more</span></a>)
         end
       end
 
@@ -171,10 +175,13 @@ describe ActionView::Base do
     end
 
     def with_locale(locale)
-      current_locale = I18n.locale
-      I18n.locale = locale
-      yield
-      I18n.locale = current_locale
+      begin
+        current_locale = I18n.locale
+        I18n.locale = locale
+        yield
+      ensure
+        I18n.locale = current_locale
+      end
     end
 
     def helper
