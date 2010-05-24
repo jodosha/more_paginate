@@ -77,6 +77,7 @@ module MorePaginate
         end
 
         def more_paginate_quoted_column(column)
+          return column if column.blank? or column.match /\./
           "#{quoted_table_name}.#{connection.quote_column_name column}"
         end
 

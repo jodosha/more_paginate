@@ -249,6 +249,16 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe "more_paginate_quoted_column" do
+    it "should quote column" do
+      Event.send(:more_paginate_quoted_column, "id").should == quoted_sql(%("events"."id"))
+    end
+
+    it "should skip when column contains '.'" do
+      Event.send(:more_paginate_quoted_column, "photos.created_at").should == "photos.created_at"
+    end
+  end
+
   private
     def with_paginate_options(options)
       yield Event.send :prepare_more_paginate_options!, options
