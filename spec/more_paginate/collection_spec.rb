@@ -40,6 +40,18 @@ describe MorePaginate::Collection do
     end
   end
 
+  describe "sort_value_method" do
+    it "should return given value" do
+      collection = instantiate_collection [ ], :sort_value_method => "last_photo_created_at"
+      collection.sort_value_method.should == "last_photo_created_at"
+    end
+
+    it "should fallback to sort_key if not configured" do
+      collection = instantiate_collection [ ]
+      collection.sort_value_method.should == "id"
+    end
+  end
+
   describe "sort_value" do
     it "should read from last record" do
       collection = instantiate_collection [ Event.new, Event.new(:name => "ADTR live!") ], :sort_key => "name"
@@ -67,6 +79,13 @@ describe MorePaginate::Collection do
 
       collection = instantiate_collection [ ], :sort_key => ""
       collection.sort_value.should be_nil
+    end
+
+    it "should return value from specified sort_value_method" do
+      event = Event.create :name => "ADTR live!"
+      event.photos << Photo.new(:title => "Stage", :created_at => 1.week.ago)
+      collection = instantiate_collection [ event ], :sort_value_method => "last_photo_created_at"
+      collection.sort_value.should == 1.week.ago.to_s(:db)
     end
 
     it "should properly handle time values" do

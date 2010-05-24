@@ -17,6 +17,7 @@ It's just a tiny enforcement for `ActiveRecord::Base#find` and it accepts the fo
 * `sort_value`
 * `sort_id`
 * `sort_order` (optional)
+* `sort_value_method` (optional)
 
 Example
 -------

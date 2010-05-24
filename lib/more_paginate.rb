@@ -25,6 +25,7 @@ module MorePaginate
         def prepare_more_paginate_options!(options)
           add_more_paginate_order!(options)
           add_more_paginate_limit!(options)
+          options.delete(:sort_value_method)
           collection_options = options.dup
           add_more_paginate_primary_key!(collection_options)
           add_more_paginate_conditions!(options)
@@ -107,8 +108,12 @@ module MorePaginate
       end
     end
 
+    def sort_value_method
+      @sort_value_method ||= @options[:sort_value_method] || sort_key
+    end
+
     def sort_value
-      @sort_value ||= typecast last.try(:read_attribute, sort_key)
+      @sort_value ||= typecast last.try(sort_value_method)
     end
 
     def sort_id

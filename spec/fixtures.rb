@@ -4,6 +4,10 @@ class Event < ActiveRecord::Base
   has_and_belongs_to_many :people
   has_many :taggings, :as => :taggable
   has_many :tags, :through => :taggings
+
+  def last_photo_created_at
+    photos.last.try(:created_at)
+  end
 end
 
 class Festival < Event
