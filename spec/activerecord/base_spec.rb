@@ -9,7 +9,7 @@ describe ActiveRecord::Base do
     it "should be able to set custom value" do
       Event.per_page.should == 23
     end
-    
+
     it "should overwrite superclass value" do
       Festival.per_page.should == 11
     end
@@ -90,7 +90,7 @@ describe ActiveRecord::Base do
           options[:order].should            == quoted_sql(%("name" DESC, "events"."id" DESC))
           collection_options[:order].should == quoted_sql(%("name" DESC, "events"."id" DESC))
         end
-      end      
+      end
     end
 
     describe "limit" do
@@ -156,7 +156,7 @@ describe ActiveRecord::Base do
         options = { :sort_key => "name", :sort_value => "ADTR live!", :sort_id => "23" }
         with_paginate_options options do |options, collection_options|
           options[:conditions].should == [quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?))), "ADTR live!", "ADTR live!", 23]
-        end        
+        end
       end
 
       it "should preserve given string SQL conditions" do
@@ -226,7 +226,7 @@ describe ActiveRecord::Base do
         Event.send(:more_paginate_condition_string, "name", "ascdesc").should == quoted_sql(%(("events"."name" > ?) OR ("events"."name" = ? AND "events"."id" > ?)))
       end
     end
-    
+
     describe "more_paginate_sql_order" do
       it "should return ASC by default" do
         options = { }
@@ -251,11 +251,31 @@ describe ActiveRecord::Base do
 
   describe "more_paginate_quoted_column" do
     it "should quote column" do
-      Event.send(:more_paginate_quoted_column, "id").should == quoted_sql(%("events"."id"))
+      Event.send(:more_paginate_quoted_column, "id").should == quoted_sql(%("id"))
     end
 
-    it "should skip when column contains '.'" do
+    it "should skip when full referenced column name" do
       Event.send(:more_paginate_quoted_column, "photos.created_at").should == "photos.created_at"
+    end
+  end
+
+  describe "more_paginate_full_quoted_column" do
+    it "should quote column" do
+      Event.send(:more_paginate_full_quoted_column, "id").should == quoted_sql(%("events"."id"))
+    end
+
+    it "should skip when full referenced column name" do
+      Event.send(:more_paginate_full_quoted_column, "photos.created_at").should == "photos.created_at"
+    end
+  end
+
+  describe "more_paginate_skip_quote_column?" do
+    it "should skip when full referenced column name" do
+      Event.send(:more_paginate_skip_quote_column?, "events.id").should be_true
+    end
+
+    it "should skip when column is blank" do
+      Event.send(:more_paginate_skip_quote_column?, "").should be_true
     end
   end
 
