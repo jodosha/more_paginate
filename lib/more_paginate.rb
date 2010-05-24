@@ -25,8 +25,8 @@ module MorePaginate
         def prepare_more_paginate_options!(options)
           add_more_paginate_order!(options)
           add_more_paginate_limit!(options)
-          options.delete(:sort_value_method)
           collection_options = options.dup
+          options.delete(:sort_value_method)
           add_more_paginate_primary_key!(collection_options)
           add_more_paginate_conditions!(options)
 
