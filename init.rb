@@ -1,3 +1,3 @@
-ActiveRecord::Base.send :include, MorePaginate
-ActionView::Base.send(:include, MorePaginate::Helpers) if defined?(ActionView)
+ActiveRecord::Base.extend MorePaginate::ActiveRecord::ClassMethods
+ActionView::Base.send(:include, MorePaginate::ActionView::Helpers) if defined?(ActionView)
 I18n.backend.store_translations :en, :more => "more" if defined?(I18n)

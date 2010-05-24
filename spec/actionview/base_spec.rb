@@ -4,7 +4,7 @@ class MockHelper
   attr_accessor :output_buffer
 
   include ActionView::Helpers
-  include MorePaginate::Helpers
+  include MorePaginate::ActionView::Helpers
 
   def initialize
     @output_buffer = ""
