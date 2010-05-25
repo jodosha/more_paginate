@@ -22,8 +22,6 @@
             url: link.attr("href"),
             beforeSend: function(xhr){
               xhr.setRequestHeader("Accept", options.accept);
-            },
-            ajaxStart: function() {
               options.start.call();
             },
             success: function(data) {
