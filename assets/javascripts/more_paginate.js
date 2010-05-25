@@ -23,6 +23,9 @@
             beforeSend: function(xhr){
               xhr.setRequestHeader("Accept", options.accept);
             },
+            ajaxStart: function() {
+              options.start.call();
+            },
             success: function(data) {
               id = link.attr("id");
               link.remove();
@@ -39,6 +42,7 @@
     },
 
     morePaginateDefaults: {
+      start:   function() { },
       success: function() { },
       disabledClass: "disabled",
       accept: "text/javascript"

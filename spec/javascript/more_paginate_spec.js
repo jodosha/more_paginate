@@ -47,7 +47,24 @@ test("should perform an AJAX request when clicked", function() {
   window.setTimeout(function() { equals( $("#events ul").size(), 2 ); }, 500);
 });
 
-test("should invoke custom function after the AJAX success", function() {
+test("should invoke custom function when start an AJAX req", function() {
+  TestUtil.reset();
+  var link = $("#more_link_success");
+  link.morePaginate({
+    container: "#events",
+    start: function() {
+      $("#fixtures").append('<div id="start">start</div>')
+    }
+  });
+
+  // wait for jQuery while inserting the server side HTML
+  window.setTimeout(function() {
+    equals( $("#events ul").size(), 1 );
+    equals( $("#start").size(),     1 );
+  }, 500);
+});
+
+test("should invoke custom function after on AJAX success", function() {
   TestUtil.reset();
   var link = $("#more_link_success");
   link.morePaginate({
@@ -67,6 +84,7 @@ test("should invoke custom function after the AJAX success", function() {
 module("morePaginateDefaults");
 test("should have defaults", function() {
   TestUtil.reset();
+  ok( $.isFunction($.fn.morePaginateDefaults['start']),   "Expected function" );
   ok( $.isFunction($.fn.morePaginateDefaults['success']), "Expected function" );
   equals( $.fn.morePaginateDefaults['disabledClass'], "disabled" );
   equals( $.fn.morePaginateDefaults['accept'], "text/javascript" );
