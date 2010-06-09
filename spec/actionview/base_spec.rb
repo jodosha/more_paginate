@@ -23,7 +23,7 @@ describe ActionView::Base do
       end
 
       it "should escape given text unless marked as safe" do
-        helper.more_paginate(records, :content => "<span>more</span>".html_safe!).should == %(<a href="#" class="more_link" data-sort-value="" id="more_link"><span>more</span></a>)
+        helper.more_paginate(records, :content => "<span>more</span>".html_safe).should == %(<a href="#" class="more_link" data-sort-value="" id="more_link"><span>more</span></a>)
       end
 
       it "should show text according to the current locale" do
