@@ -7,6 +7,7 @@ group :development do
 end
 
 group :test do
+  gem "hanoi"
   gem "rack", "1.1.0"
   gem "activesupport", "2.3.8"
   gem "activerecord", "2.3.8"

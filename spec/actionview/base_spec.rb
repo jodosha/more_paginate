@@ -96,7 +96,7 @@ describe ActionView::Base do
 
     describe "sort_value" do
       it "should use given value" do
-        events = records [ Event.new :name => "ADTR live!" ], :sort_key => "name"
+        events = records [ Event.new(:name => "ADTR live!") ], :sort_key => "name"
         events.stub!(:more?).and_return true
         helper.more_paginate(events).should == %(<a href="?sort_key=name&amp;sort_value=ADTR+live%21&amp;sort_id=" class="more_link" data-sort-value="ADTR+live%21" id="more_link">more</a>)
       end
@@ -149,7 +149,7 @@ describe ActionView::Base do
 
     describe "data-sort-value" do
       it "should set HTML5 attribute" do
-        events = records [ Event.new :name => "ADTR live!" ], :sort_key => "name"
+        events = records [ Event.new(:name => "ADTR live!") ], :sort_key => "name"
         events.stub!(:more?).and_return true
         helper.more_paginate(events).should == %(<a href="?sort_key=name&amp;sort_value=ADTR+live%21&amp;sort_id=" class="more_link" data-sort-value="ADTR+live%21" id="more_link">more</a>)
       end
