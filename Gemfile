@@ -6,15 +6,26 @@ group :development do
   gem "sqlite3-ruby"
 end
 
-group :test do
+group :test, :rails3 do
   gem "hanoi"
   gem "rack", "1.1.0"
-  gem "activesupport", "2.3.8"
-  gem "activerecord", "2.3.8"
-  gem "actionpack", "2.3.8"
 end
 
-group :development, :test do
+group :development, :test, :rails3 do
   gem "ruby-debug"
   gem "rspec"
+end
+
+if ENV["MORE_PAGINATE_ENV"] == "rails3"
+  group :rails3 do
+    gem "activesupport", "3.0.0.beta4"
+    gem "activerecord", "3.0.0.beta4"
+    gem "actionpack", "3.0.0.beta4"
+  end
+else
+  group :test do
+    gem "activesupport", "2.3.8"
+    gem "activerecord", "2.3.8"
+    gem "actionpack", "2.3.8"
+  end
 end
