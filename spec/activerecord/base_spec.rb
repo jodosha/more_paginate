@@ -105,8 +105,8 @@ describe ActiveRecord::Base do
       it "should use given value" do
         options = { :limit => 1000 }
         with_paginate_options options do |options, collection_options|
-          options[:limit].should            == 1000
-          collection_options[:limit].should == 1000
+          options[:limit].should            == 1001
+          collection_options[:limit].should == 1001
         end
       end
     end
