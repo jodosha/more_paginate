@@ -51,7 +51,7 @@ module MorePaginate
         end
 
         def add_more_paginate_limit!(options)
-          options[:limit] = options.fetch(:limit, per_page + 1)
+          options[:limit] = options.fetch(:limit, per_page) + 1
         end
 
         def add_more_paginate_conditions!(options)
