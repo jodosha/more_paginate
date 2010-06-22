@@ -1,7 +1,7 @@
 (function($){
   $.fn.extend({
     morePaginate: function(options) {
-      var options = $.extend($.fn.morePaginateDefaults, options);
+      var options = $.extend({ }, $.fn.morePaginateDefaults, options);
 
       return this.each(function() {
         var link = $(this);
