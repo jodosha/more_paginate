@@ -1,12 +1,15 @@
 $:.unshift 'lib'
 require 'rubygems'
-require "spec/rake/spectask"
-require "hanoi"
+require 'hanoi'
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
+require 'rspec/core/rake_task'
 
-task :default => "spec:all"
+task :default => 'spec:all'
 namespace :spec do
   desc "Run all the specs."
-  task :all => [ :spec, "spec:javascripts" ] do
+  task :all => [ :spec, 'spec:javascripts' ] do
   end
 
   desc "Runs all the JavaScript tests and collects the results"
@@ -19,13 +22,7 @@ namespace :spec do
   end
 end
 
-Spec::Rake::SpecTask.new do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
-  t.spec_opts = %w(-fs --color)
-end
-
-desc "Run all examples with RCov"
-Spec::Rake::SpecTask.new(:rcov) do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
-  t.rcov = true
+RSpec::Core::RakeTask.new do |spec|
+  spec.pattern = 'spec/**/*_spec.rb'
+  spec.rspec_opts = ['-fs --color --backtrace']
 end
