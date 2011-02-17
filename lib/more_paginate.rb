@@ -230,7 +230,7 @@ module MorePaginate
         end
 
         if block_given?
-          link_to concat(capture(&block)), url, options
+          link_to url, options, &block
         else
           link_to escape_content(content), url, options
         end
@@ -239,9 +239,9 @@ module MorePaginate
       private
         def escape_content(content)
           if content.try(:html_safe?)
-            content
+            raw content
           else
-            h content
+            content
           end
         end
     end

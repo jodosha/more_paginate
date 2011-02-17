@@ -169,7 +169,7 @@ describe ActionView::Base do
     end
 
     def many_records
-      returning result = records do
+      records.tap do |result|
         result.stub!(:more?).and_return true
       end
     end

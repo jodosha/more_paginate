@@ -1,12 +1,12 @@
 var TestUtil = {
   defaults: {
+    start:   function() { },
     success: function() { },
     disabledClass: "disabled",
     accept: "text/javascript"
   },
 
   reset: function() {
-    $.extend($.fn.morePaginateDefaults, this.defaults);
     $("#events").html("");
   }
 }
