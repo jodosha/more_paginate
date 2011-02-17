@@ -5,6 +5,7 @@ Bundler.setup
 require 'active_support'
 require 'active_record'
 require 'action_view'
+require 'action_view/template/handlers/erb'
 require 'rack'
 $:.unshift File.expand_path(File.dirname(__FILE__) + '/..')
 require 'lib/more_paginate'
